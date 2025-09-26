@@ -10,6 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StatsCards } from "@/components/dashboard/stats-cards";
+import {
+  UserStatsCards,
+  UserRoleBreakdown,
+} from "@/components/users/user-stats";
+import {
+  MerchantStatsCards,
+  MerchantStatusBreakdown,
+} from "@/components/merchants/merchant-stats";
 import { useAuthStore } from "@/lib/store/auth";
 import {
   Plus,
@@ -38,6 +46,13 @@ export default function DashboardPage() {
       href: "/inventory",
       icon: <Package className="h-5 w-5" />,
       show: true,
+    },
+    {
+      title: "Manage Merchants",
+      description: "Add or edit merchant contacts",
+      href: "/merchants",
+      icon: <Store className="h-5 w-5" />,
+      show: hasPermission("Manager"),
     },
     {
       title: "Manage Users",
@@ -86,9 +101,17 @@ export default function DashboardPage() {
       {/* Stats Cards */}
       <StatsCards />
 
+      {/* Manager+ Merchant Stats */}
+      {hasPermission("Manager") && <MerchantStatsCards />}
+
+      {/* Admin-only User Stats */}
+      {hasPermission("Admin") && <UserStatsCards />}
+
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Quick Actions */}
-        <div className="lg:col-span-2">
+        <div
+          className={hasPermission("Admin") ? "lg:col-span-2" : "lg:col-span-2"}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
@@ -121,29 +144,40 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest system activities</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                  <Clock className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{activity.action}</p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {activity.item}
+        {/* Recent Activity and User Role Breakdown */}
+        <div className="space-y-6">
+          {/* Recent Activity */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Latest system activities</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                    <Clock className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{activity.action}</p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {activity.item}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {activity.time}
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground">{activity.time}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* User Role Breakdown for Admins */}
+          {hasPermission("Admin") && <UserRoleBreakdown />}
+
+          {/* Merchant Status Breakdown for Managers */}
+          {hasPermission("Manager") && <MerchantStatusBreakdown />}
+        </div>
       </div>
 
       {/* Role-based Information */}
