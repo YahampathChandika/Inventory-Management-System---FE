@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -10,14 +11,21 @@ export function useAuth() {
   const queryClient = useQueryClient();
   const {
     user,
+    token,
     isAuthenticated,
     isLoading,
-    setUser,
+    setAuth,
     setLoading,
     logout: logoutStore,
+    initializeAuth,
   } = useAuthStore();
 
-  // Check authentication status
+  // Initialize auth state from localStorage on mount
+  React.useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  // Check authentication status - only if we have a token but no user
   const { data: authData } = useQuery({
     queryKey: ["auth", "profile"],
     queryFn: async () => {
@@ -27,22 +35,22 @@ export function useAuth() {
         );
         return response.data;
       } catch (error) {
+        // If profile fetch fails, clear auth state
+        logoutStore();
         throw error;
       }
     },
-    enabled: !isAuthenticated && !user,
+    enabled: !!token && !user && !isLoading, // Only run if we have token but no user
     retry: false,
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Set user data when auth query succeeds
   React.useEffect(() => {
-    if (authData) {
-      setUser(authData);
-    } else if (!isLoading) {
-      setUser(null);
+    if (authData && token) {
+      setAuth(authData, token);
     }
-  }, [authData, setUser, isLoading]);
+  }, [authData, token, setAuth]);
 
   // Login mutation
   const loginMutation = useMutation({
@@ -53,8 +61,13 @@ export function useAuth() {
       );
       return response;
     },
-    onSuccess: (data) => {
-      setUser(data.data.user);
+    onSuccess: (response) => {
+      const { user, token } = response.data;
+      setAuth(user, token);
+
+      // Invalidate and refetch all queries
+      queryClient.invalidateQueries();
+
       toast.success("Login successful");
       router.push("/dashboard");
     },
@@ -98,6 +111,7 @@ export function useAuth() {
 
   return {
     user,
+    token,
     isAuthenticated,
     isLoading: isLoading || loginMutation.isPending,
     login,
@@ -106,6 +120,3 @@ export function useAuth() {
     isLogoutPending: logoutMutation.isPending,
   };
 }
-
-// You'll need to add this import at the top
-import React from "react";

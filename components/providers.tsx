@@ -4,7 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/lib/react-query";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ export function Providers({ children }: ProvidersProps) {
       disableTransitionOnChange
     >
       <QueryClientProvider client={queryClient}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <Toaster richColors position="top-right" />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

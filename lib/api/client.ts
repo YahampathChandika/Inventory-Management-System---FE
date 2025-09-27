@@ -9,16 +9,23 @@ export class ApiClient {
     this.baseURL = baseURL;
   }
 
+  private getAuthToken(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("auth_token");
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
+    const token = this.getAuthToken();
 
     const config: RequestInit = {
-      credentials: "include", // Important for httpOnly cookies
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,
@@ -26,12 +33,32 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, config);
+
+      // Handle 401 Unauthorized - token might be expired or invalid
+      if (response.status === 401) {
+        // Clear stored auth data
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("auth_user");
+        }
+
+        // Don't redirect here - let the calling component handle it
+        // This prevents infinite redirects during login attempts
+        const errorData = await response.json().catch(() => ({}));
+        const error: ApiError = errorData;
+        throw new Error(
+          error.error?.message || "Unauthorized - Please login again"
+        );
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle API errors
+        // Handle other API errors
         const error: ApiError = data;
-        throw new Error(error.error?.message || "An error occurred");
+        throw new Error(
+          error.error?.message || `HTTP ${response.status}: An error occurred`
+        );
       }
 
       return data;
