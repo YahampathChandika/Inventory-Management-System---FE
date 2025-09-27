@@ -1,11 +1,11 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/layout/protected-route";
+import { InventoryTable } from "@/components/inventory/inventory-table";
 
-export default function InventoryLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <ProtectedRoute requiredRole="Viewer">{children}</ProtectedRoute>;
+export default function InventoryPage() {
+  return (
+    <div className="space-y-6">
+      <InventoryTable />
+    </div>
+  );
 }
