@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Inventory Management System",
   description: "A comprehensive inventory management solution",
+  keywords: ["inventory", "management", "system", "stock", "warehouse"],
+  authors: [{ name: "Your Company" }],
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
