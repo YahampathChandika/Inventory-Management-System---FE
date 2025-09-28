@@ -1,150 +1,173 @@
 import { create } from "zustand";
+import Cookies from "js-cookie";
 import { User } from "@/types";
+import { apiClient } from "@/lib/api/client";
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setUser: (user: User | null) => void;
-  setToken: (token: string | null) => void;
-  setAuth: (user: User, token: string) => void;
-  setLoading: (loading: boolean) => void;
-  logout: () => void;
-  hasPermission: (requiredRole: "Admin" | "Manager" | "Viewer") => boolean;
-  isAdmin: () => boolean;
-  isManager: () => boolean;
-  isViewer: () => boolean;
-  initializeAuth: () => void;
 }
 
-const roleHierarchy = {
-  Admin: 3,
-  Manager: 2,
-  Viewer: 1,
+interface AuthActions {
+  login: (credentials: { username: string; password: string }) => Promise<void>;
+  logout: () => void;
+  initializeAuth: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
+  hasPermission: (requiredRole: "Admin" | "Manager" | "Viewer") => boolean;
+}
+
+type AuthStore = AuthState & AuthActions;
+
+// Cookie configuration
+const COOKIE_OPTIONS = {
+  secure: process.env.NODE_ENV === "production", // Only HTTPS in production
+  sameSite: "lax" as const, // CSRF protection
+  expires: 1, // 1 day
+  path: "/", // Available across the app
 };
 
-// Token storage utilities
-const TOKEN_KEY = "auth_token";
-const USER_KEY = "auth_user";
+const TOKEN_COOKIE_NAME = "auth_token";
+const USER_COOKIE_NAME = "auth_user";
 
-// Cookie utilities for server-side access
-const setCookie = (name: string, value: string, days: number = 1) => {
-  if (typeof document === "undefined") return;
-
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
-};
-
-const deleteCookie = (name: string) => {
-  if (typeof document === "undefined") return;
-  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Lax`;
-};
-
-const getStoredToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
-};
-
-const getStoredUser = (): User | null => {
-  if (typeof window === "undefined") return null;
-  const userStr = localStorage.getItem(USER_KEY);
-  try {
-    return userStr ? JSON.parse(userStr) : null;
-  } catch {
-    return null;
-  }
-};
-
-const setStoredToken = (token: string | null): void => {
-  if (typeof window === "undefined") return;
-  if (token) {
-    localStorage.setItem(TOKEN_KEY, token);
-    // Also set as cookie for middleware access
-    setCookie(TOKEN_KEY, token, 1); // 1 day expiration
-  } else {
-    localStorage.removeItem(TOKEN_KEY);
-    deleteCookie(TOKEN_KEY);
-  }
-};
-
-const setStoredUser = (user: User | null): void => {
-  if (typeof window === "undefined") return;
-  if (user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(USER_KEY);
-  }
-};
-
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set, get) => ({
+  // Initial state
   user: null,
   token: null,
   isAuthenticated: false,
   isLoading: true,
 
-  setUser: (user) => {
-    setStoredUser(user);
-    set({
-      user,
-      isAuthenticated: !!user,
-    });
-  },
+  // Actions
+  login: async (credentials) => {
+    try {
+      set({ isLoading: true });
 
-  setToken: (token) => {
-    setStoredToken(token);
-    set({ token });
-  },
+      interface LoginResponse {
+        data: {
+          user: User;
+          token: string;
+        };
+      }
 
-  setAuth: (user, token) => {
-    setStoredUser(user);
-    setStoredToken(token);
-    set({
-      user,
-      token,
-      isAuthenticated: true,
-      isLoading: false,
-    });
-  },
+      const response = await apiClient.post<LoginResponse>(
+        "/auth/login",
+        credentials
+      );
+      const { user, token } = response.data;
 
-  setLoading: (isLoading) => set({ isLoading }),
+      // Store in cookies
+      Cookies.set(TOKEN_COOKIE_NAME, token, COOKIE_OPTIONS);
+      Cookies.set(USER_COOKIE_NAME, JSON.stringify(user), COOKIE_OPTIONS);
+
+      // Update store
+      set({
+        user,
+        token,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
 
   logout: () => {
-    setStoredToken(null);
-    setStoredUser(null);
+    // Remove cookies
+    Cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
+    Cookies.remove(USER_COOKIE_NAME, { path: "/" });
+
+    // Clear store
     set({
       user: null,
       token: null,
       isAuthenticated: false,
       isLoading: false,
     });
+
+    // Redirect to login
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
   },
 
-  initializeAuth: () => {
-    const storedToken = getStoredToken();
-    const storedUser = getStoredUser();
+  initializeAuth: async () => {
+    try {
+      set({ isLoading: true });
 
-    if (storedToken && storedUser) {
-      // Verify token is still valid (optional)
-      const isValidToken = isTokenValid(storedToken);
+      // Get token from cookies
+      const token = Cookies.get(TOKEN_COOKIE_NAME);
+      const userJson = Cookies.get(USER_COOKIE_NAME);
 
-      if (isValidToken) {
+      if (!token || !userJson) {
         set({
-          user: storedUser,
-          token: storedToken,
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+        return;
+      }
+
+      // Parse user data
+      let user: User;
+      try {
+        user = JSON.parse(userJson);
+      } catch (parseError) {
+        // Invalid user data in cookie, clear everything
+        Cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
+        Cookies.remove(USER_COOKIE_NAME, { path: "/" });
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+        return;
+      }
+
+      // Validate token by fetching current user profile
+      try {
+        const response = await apiClient.get<{ data: User }>("/auth/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const currentUser = response.data;
+
+        // Update user data in case it changed
+        Cookies.set(
+          USER_COOKIE_NAME,
+          JSON.stringify(currentUser),
+          COOKIE_OPTIONS
+        );
+
+        set({
+          user: currentUser,
+          token,
           isAuthenticated: true,
           isLoading: false,
         });
-
-        // Ensure cookie is set for middleware
-        setCookie(TOKEN_KEY, storedToken, 1);
-      } else {
-        // Token expired, clear everything
-        get().logout();
+      } catch (error) {
+        // Token is invalid, clear everything
+        Cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
+        Cookies.remove(USER_COOKIE_NAME, { path: "/" });
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
       }
-    } else {
+    } catch (error) {
+      console.error("Error initializing auth:", error);
       set({
         user: null,
         token: null,
@@ -154,43 +177,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  updateUser: (userData) => {
+    const currentUser = get().user;
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...userData };
+
+      // Update cookie
+      Cookies.set(
+        USER_COOKIE_NAME,
+        JSON.stringify(updatedUser),
+        COOKIE_OPTIONS
+      );
+
+      // Update store
+      set({ user: updatedUser });
+    }
+  },
+
   hasPermission: (requiredRole) => {
     const { user } = get();
     if (!user) return false;
 
-    const userRoleLevel =
-      roleHierarchy[user.role.name as keyof typeof roleHierarchy];
-    const requiredRoleLevel = roleHierarchy[requiredRole];
+    const roleHierarchy = {
+      Viewer: 1,
+      Manager: 2,
+      Admin: 3,
+    };
 
-    return userRoleLevel >= requiredRoleLevel;
-  },
+    const userLevel =
+      roleHierarchy[user.role.name as keyof typeof roleHierarchy] || 0;
+    const requiredLevel = roleHierarchy[requiredRole];
 
-  isAdmin: () => {
-    const { user } = get();
-    return user?.role.name === "Admin";
-  },
-
-  isManager: () => {
-    const { user } = get();
-    return user?.role.name === "Manager" || user?.role.name === "Admin";
-  },
-
-  isViewer: () => {
-    const { user } = get();
-    return !!user; // All authenticated users can view
+    return userLevel >= requiredLevel;
   },
 }));
-
-// Helper function to check if token is valid (optional)
-function isTokenValid(token: string): boolean {
-  try {
-    const payload = token.split(".")[1];
-    const decoded = JSON.parse(atob(payload));
-
-    // Check if token is expired
-    const currentTime = Math.floor(Date.now() / 1000);
-    return decoded.exp > currentTime;
-  } catch {
-    return false;
-  }
-}

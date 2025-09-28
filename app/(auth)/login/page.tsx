@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -12,15 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/use-auth";
-import { LoginRequest } from "@/types";
-import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/lib/store/auth";
+import { toast } from "sonner";
+import { Loader2, Eye, EyeOff, Shield } from "lucide-react";
 
+// Login form validation schema
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  username: z.string().min(1, "Username or email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -28,82 +29,129 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated, isLoginPending } = useAuth();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { login } = useAuthStore();
+
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    }
-  }, [isAuthenticated, router]);
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setIsLoading(true);
 
-  const onSubmit = (data: LoginFormData) => {
-    const loginData: LoginRequest = {
-      username: data.username,
-      password: data.password,
-    };
-    login(loginData);
+      await login(data);
+
+      toast.success("Login successful!");
+
+      // Redirect to intended page or dashboard
+      router.push(redirectTo);
+    } catch (error: any) {
+      console.error("Login error:", error);
+
+      // Handle different error types
+      if (error.status === 401) {
+        toast.error("Invalid username or password");
+      } else if (error.status === 429) {
+        toast.error("Too many login attempts. Please try again later.");
+      } else if (error.message?.includes("User account is disabled")) {
+        toast.error(
+          "Your account has been disabled. Please contact an administrator."
+        );
+      } else {
+        toast.error(error.message || "Login failed. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  if (isAuthenticated) {
-    return null; // Prevent flash of login form
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Sign In
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access the inventory system
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-2 text-center">
+          <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-2">
+            <Shield className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardDescription>
+            Sign in to your Inventory Management account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Username/Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">Username or Email</Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Enter your username"
-                {...register("username")}
-                disabled={isLoginPending}
+                placeholder="Enter your username or email"
+                disabled={isLoading}
+                {...form.register("username")}
+                className={
+                  form.formState.errors.username ? "border-destructive" : ""
+                }
               />
-              {errors.username && (
+              {form.formState.errors.username && (
                 <p className="text-sm text-destructive">
-                  {errors.username.message}
+                  {form.formState.errors.username.message}
                 </p>
               )}
             </div>
 
+            {/* Password Field */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                {...register("password")}
-                disabled={isLoginPending}
-              />
-              {errors.password && (
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  disabled={isLoading}
+                  {...form.register("password")}
+                  className={
+                    form.formState.errors.password
+                      ? "border-destructive pr-10"
+                      : "pr-10"
+                  }
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+              {form.formState.errors.password && (
                 <p className="text-sm text-destructive">
-                  {errors.password.message}
+                  {form.formState.errors.password.message}
                 </p>
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoginPending}>
-              {isLoginPending ? (
+            {/* Submit Button */}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Signing in...
@@ -114,21 +162,25 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Demo credentials */}
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2">Demo Credentials:</p>
-            <div className="text-xs space-y-1">
-              <p>
-                <strong>Admin:</strong> admin / admin123
+          {/* Demo Credentials */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="mt-6 p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium text-muted-foreground mb-2">
+                Demo Credentials:
               </p>
-              <p>
-                <strong>Manager:</strong> manager / manager123
-              </p>
-              <p>
-                <strong>Viewer:</strong> viewer / viewer123
-              </p>
+              <div className="text-xs space-y-1">
+                <div>
+                  <strong>Admin:</strong> admin@empite.com / admin123
+                </div>
+                <div>
+                  <strong>Manager:</strong> manager@test.com / manager123
+                </div>
+                <div>
+                  <strong>Viewer:</strong> viewer@test.com / viewer123
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
