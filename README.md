@@ -92,7 +92,7 @@ A modern, responsive inventory management system built with Next.js and TypeScri
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/YahampathChandika/Inventory-Management-System---FE
    cd inventory-management-frontend
    ```
 
@@ -122,13 +122,6 @@ A modern, responsive inventory management system built with Next.js and TypeScri
    ```
    http://localhost:3000
    ```
-
-### Default Login Credentials
-```
-Username: admin@empite.com
-Password: admin123
-Role: Admin
-```
 
 ## 🏗 Build & Deployment
 
