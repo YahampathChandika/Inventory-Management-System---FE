@@ -30,7 +30,7 @@ export default function EditUserPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 w-11/12">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/users">
             <Button variant="outline" size="icon">

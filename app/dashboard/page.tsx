@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,10 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StatsCards } from "@/components/dashboard/stats-cards";
-import {
-  UserStatsCards,
-  UserRoleBreakdown,
-} from "@/components/users/user-stats";
 import {
   MerchantStatsCards,
   MerchantStatusBreakdown,
@@ -104,9 +99,6 @@ export default function DashboardPage() {
       {/* Manager+ Merchant Stats */}
       {hasPermission("Manager") && <MerchantStatsCards />}
 
-      {/* Admin-only User Stats */}
-      {hasPermission("Admin") && <UserStatsCards />}
-
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Quick Actions */}
         <div
@@ -172,45 +164,10 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* User Role Breakdown for Admins */}
-          {hasPermission("Admin") && <UserRoleBreakdown />}
-
           {/* Merchant Status Breakdown for Managers */}
           {hasPermission("Manager") && <MerchantStatusBreakdown />}
         </div>
       </div>
-
-      {/* Role-based Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Role: {user?.role.name}</CardTitle>
-          <CardDescription>
-            {user?.role.description || "Role-based access information"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground">
-            {user?.role.name === "Admin" && (
-              <p>
-                As an Admin, you have full access to all system features
-                including user management, inventory control, and reporting.
-              </p>
-            )}
-            {user?.role.name === "Manager" && (
-              <p>
-                As a Manager, you can manage inventory, send reports to
-                merchants, and oversee day-to-day operations.
-              </p>
-            )}
-            {user?.role.name === "Viewer" && (
-              <p>
-                As a Viewer, you can browse and monitor inventory levels and
-                system information.
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

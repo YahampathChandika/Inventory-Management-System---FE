@@ -136,7 +136,7 @@ export default function SendReportPage() {
   const isFormValid = recipientEmails.length > 0 && subject.trim().length > 0;
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <div className="space-y-6 w-11/12">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/dashboard/reports">
@@ -203,8 +203,8 @@ export default function SendReportPage() {
                           htmlFor={`merchant-${merchant.id}`}
                           className="flex-1 cursor-pointer"
                         >
-                          <div className="flex items-center justify-between">
-                            <span>{merchant.name}</span>
+                          <div className="flex items-center justify-between space-x-2">
+                            <span>{merchant.name} | </span>
                             <span className="text-sm text-muted-foreground">
                               {merchant.email}
                             </span>

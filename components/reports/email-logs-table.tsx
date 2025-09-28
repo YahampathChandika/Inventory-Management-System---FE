@@ -377,7 +377,7 @@ export function EmailLogsTable({
           {/* Pagination */}
           {data && data.pagination.totalPages > 1 && (
             <div className="flex items-center justify-between p-4 border-t">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground hidden sm:block">
                 Showing {(data.pagination.page - 1) * data.pagination.limit + 1}{" "}
                 to{" "}
                 {Math.min(

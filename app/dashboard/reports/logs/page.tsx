@@ -41,7 +41,7 @@ export default function EmailLogsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-11/12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -51,14 +51,14 @@ export default function EmailLogsPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">Email Logs</h1>
-            <p className="text-muted-foreground">
+            <h1 className="md:text-2xl font-bold">Email Logs</h1>
+            <p className="text-xs md:text-sm text-muted-foreground">
               View and manage all sent inventory reports
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-center gap-2">
           <Button
             variant="outline"
             onClick={handleExportAll}
@@ -79,7 +79,7 @@ export default function EmailLogsPage() {
 
       {/* Quick Stats */}
       {emailStats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -122,21 +122,6 @@ export default function EmailLogsPage() {
               <p className="text-xs text-muted-foreground">Need attention</p>
             </CardContent>
           </Card>
-
-          {emailStats.totalPending > 0 && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">
-                  {emailStats.totalPending}
-                </div>
-                <p className="text-xs text-muted-foreground">In queue</p>
-              </CardContent>
-            </Card>
-          )}
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

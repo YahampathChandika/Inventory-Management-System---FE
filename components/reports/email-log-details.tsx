@@ -136,7 +136,7 @@ export function EmailLogDetails({
   const sentDate = emailLog.sentAt ? formatDate(emailLog.sentAt) : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-11/12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

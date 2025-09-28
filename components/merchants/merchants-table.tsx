@@ -153,7 +153,7 @@ export function MerchantsTable({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-center gap-2">
           <BulkImport>
             <Button variant="outline">
               <Upload className="mr-2 h-4 w-4" />
@@ -187,7 +187,7 @@ export function MerchantsTable({
             value={queryParams.status || "all"}
             onValueChange={handleStatusFilter}
           >
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[180px]">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -348,7 +348,7 @@ export function MerchantsTable({
       {/* Pagination */}
       {data?.pagination && data.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground hidden sm:block">
             Showing {(data.pagination.page - 1) * data.pagination.limit + 1} to{" "}
             {Math.min(
               data.pagination.page * data.pagination.limit,
