@@ -123,25 +123,6 @@ A modern, responsive inventory management system built with Next.js and TypeScri
    http://localhost:3000
    ```
 
-## 🏗 Build & Deployment
-
-### Development Build
-```bash
-npm run dev          # Start development server with hot reload
-npm run build        # Create production build
-npm run start        # Start production server
-npm run lint         # Run ESLint
-```
-
-### Production Deployment
-```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
 ### Environment Variables
 
 #### Required
