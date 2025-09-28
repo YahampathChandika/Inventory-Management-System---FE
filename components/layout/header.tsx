@@ -130,24 +130,24 @@ export function Header({ title, isCollapsed, onToggleCollapse }: HeaderProps) {
               <DropdownMenuSeparator />
 
               {/* Profile Settings */}
-              {canAccess("profile.view") && (
+              {/* {canAccess("profile.view") && (
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/profile">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-              )}
+              )} */}
 
               {/* Settings - Admin only */}
-              {canAccess("users.view") && (
+              {/* {canAccess("users.view") && (
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
-              )}
+              )} */}
 
               <DropdownMenuSeparator />
 

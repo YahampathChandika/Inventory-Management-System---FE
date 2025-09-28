@@ -98,7 +98,7 @@ export function useSendToAllMerchants() {
   return useMutation({
     mutationFn: async (data: { subject?: string; customMessage?: string }) => {
       const response = await apiClient.post<ApiResponse<SendReportResponse>>(
-        "/reports/send-to-merchants",
+        "/reports/send-to-all-merchants",
         data
       );
       return response.data;

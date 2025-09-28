@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,10 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useRoles } from "@/hooks/use-users";
-import { User } from "@/types";
-import { CreateUserRequest, UpdateUserRequest } from "@/hooks/use-users";
-import { Loader2, Shield, Mail, User as UserIcon } from "lucide-react";
+import { Loader2, Shield, Mail, User, Eye, EyeOff } from "lucide-react";
+
+// Mock data for demonstration
+const mockRoles = [
+  { id: 1, name: "Admin", description: "Full system access" },
+  { id: 2, name: "Manager", description: "Manage inventory and reports" },
+  { id: 3, name: "Viewer", description: "View-only access" },
+];
 
 const createUserSchema = z.object({
   username: z
@@ -41,8 +46,12 @@ const createUserSchema = z.object({
     .max(255, "Email is too long"),
   password: z
     .string()
-    .min(6, "Password must be at least 6 characters")
-    .max(100, "Password is too long"),
+    .min(8, "Password must be at least 8 characters")
+    .max(100, "Password is too long")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/,
+      "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and only allowed special characters (@$!%*?&)"
+    ),
   roleId: z.coerce.number().min(1, "Please select a role"),
   isActive: z.boolean().default(true),
 });
@@ -54,6 +63,29 @@ const updateUserSchema = createUserSchema.omit({ password: true }).extend({
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 type UpdateUserFormData = z.infer<typeof updateUserSchema>;
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: { id: number; name: string };
+  isActive: boolean;
+}
+
+interface CreateUserRequest {
+  username: string;
+  email: string;
+  password: string;
+  roleId: number;
+  isActive: boolean;
+}
+
+interface UpdateUserRequest {
+  username: string;
+  email: string;
+  roleId: number;
+  isActive: boolean;
+}
+
 interface UserFormProps {
   initialData?: User;
   onSubmit: (data: CreateUserRequest | UpdateUserRequest) => void;
@@ -64,10 +96,14 @@ interface UserFormProps {
 export function UserForm({
   initialData,
   onSubmit,
-  isLoading,
+  isLoading = false,
   mode,
 }: UserFormProps) {
-  const { data: roles, isLoading: rolesLoading } = useRoles();
+  const roles = mockRoles; // Replace with actual useRoles() hook
+  const rolesLoading = false;
+
+  // Password visibility state
+  const [showPassword, setShowPassword] = useState(false);
 
   const schema = mode === "create" ? createUserSchema : updateUserSchema;
 
@@ -114,6 +150,7 @@ export function UserForm({
   };
 
   const handleReset = () => {
+    setShowPassword(false); // Reset password visibility
     if (mode === "create") {
       reset({
         username: "",
@@ -145,11 +182,15 @@ export function UserForm({
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <UserIcon className="h-5 w-5" />
+          <User className="h-5 w-5" />
           {mode === "create" ? "Create New User" : "Edit User"}
         </CardTitle>
         <CardDescription>
@@ -159,12 +200,12 @@ export function UserForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(handleFormSubmit as any)} className="space-y-6">
+        <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Username */}
             <div className="space-y-2">
               <Label htmlFor="username" className="flex items-center gap-2">
-                <UserIcon className="h-4 w-4" />
+                <User className="h-4 w-4" />
                 Username *
               </Label>
               <Input
@@ -207,21 +248,44 @@ export function UserForm({
             {mode === "create" && (
               <div className="space-y-2">
                 <Label htmlFor="password">Password *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter password"
-                  {...register("password")}
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    {...register("password")}
+                    disabled={isLoading}
+                    className="pr-10"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
+                    onClick={togglePasswordVisibility}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
                 {errors.password && (
                   <p className="text-sm text-destructive">
                     {errors.password.message}
                   </p>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  Minimum 6 characters
-                </p>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="font-medium">Password requirements:</p>
+                  <ul className="space-y-0.5 ml-2">
+                    <li>• At least 8 characters long</li>
+                    <li>• Include at least 1 uppercase letter</li>
+                    <li>• Include at least 1 lowercase letter</li>
+                    <li>• Include at least 1 number</li>
+                    <li>• Only allowed special characters: @$!%*?&</li>
+                  </ul>
+                </div>
               </div>
             )}
 
@@ -236,7 +300,7 @@ export function UserForm({
                 onValueChange={(value) => setValue("roleId", parseInt(value))}
                 disabled={isLoading || rolesLoading}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,7 +337,7 @@ export function UserForm({
             </div>
             <Switch
               checked={watchedIsActive}
-              onCheckedChange={(checked: any) => setValue("isActive", checked)}
+              onCheckedChange={(checked) => setValue("isActive", checked)}
               disabled={isLoading}
             />
           </div>
@@ -326,7 +390,10 @@ export function UserForm({
 
           {/* Form Actions */}
           <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={isLoading || rolesLoading}>
+            <Button
+              onClick={handleSubmit(handleFormSubmit as any)}
+              disabled={isLoading || rolesLoading}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -340,7 +407,6 @@ export function UserForm({
             </Button>
 
             <Button
-              type="button"
               variant="outline"
               onClick={handleReset}
               disabled={isLoading}
@@ -348,7 +414,7 @@ export function UserForm({
               Reset
             </Button>
           </div>
-        </form>
+        </div>
       </CardContent>
     </Card>
   );

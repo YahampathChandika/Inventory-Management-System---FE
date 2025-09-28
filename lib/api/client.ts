@@ -66,7 +66,7 @@ class ApiClient {
 
       // Create error object with API error details
       const error = new Error(
-        data.error?.message || `HTTP error! status: ${response.status}`
+        data?.message || data.error?.message || `HTTP error! status: ${response.status}`
       );
       (error as any).status = response.status;
       (error as any).code = data.error?.code;

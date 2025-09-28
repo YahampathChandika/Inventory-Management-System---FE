@@ -43,9 +43,19 @@ export default function LoginPage() {
       username: "",
       password: "",
     },
+    // Prevent form reset on submission errors
+    shouldFocusError: false,
+    mode: "onSubmit",
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (
+    data: LoginFormData,
+    event?: React.BaseSyntheticEvent
+  ) => {
+    // Prevent any default behavior
+    event?.preventDefault();
+    event?.stopPropagation();
+
     try {
       setIsLoading(true);
 
@@ -58,25 +68,32 @@ export default function LoginPage() {
     } catch (error: any) {
       console.error("Login error:", error);
 
-      // Handle different error types
-      if (error.status === 401) {
-        toast.error("Invalid username or password");
-      } else if (error.status === 429) {
-        toast.error("Too many login attempts. Please try again later.");
-      } else if (error.message?.includes("User account is disabled")) {
-        toast.error(
-          "Your account has been disabled. Please contact an administrator."
-        );
-      } else {
-        toast.error(error.message || "Login failed. Please try again.");
+      // Extract error message from backend response
+      let errorMessage = "Login failed. Please try again.";
+
+      if (error.message) {
+        if (Array.isArray(error.message)) {
+          errorMessage = error.message.join(", ");
+        } else {
+          errorMessage = error.message;
+        }
       }
+
+      // Display the error message
+      toast.error(errorMessage);
+
+      form.setValue("password", "", {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
+      setTimeout(() => form.setFocus("password"), 100);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-2 text-center">
           <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-2">
@@ -89,7 +106,14 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit(onSubmit)(e);
+            }}
+            className="space-y-4"
+          >
             {/* Username/Email Field */}
             <div className="space-y-2">
               <Label htmlFor="username">Username or Email</Label>
@@ -102,6 +126,7 @@ export default function LoginPage() {
                 className={
                   form.formState.errors.username ? "border-destructive" : ""
                 }
+                autoComplete="username"
               />
               {form.formState.errors.username && (
                 <p className="text-sm text-destructive">
@@ -125,6 +150,7 @@ export default function LoginPage() {
                       ? "border-destructive pr-10"
                       : "pr-10"
                   }
+                  autoComplete="current-password"
                 />
                 <Button
                   type="button"
@@ -170,7 +196,7 @@ export default function LoginPage() {
               </p>
               <div className="text-xs space-y-1">
                 <div>
-                  <strong>Admin:</strong> admin@empite.com / admin123
+                  <strong>Admin:</strong> admin@test.com / admin123
                 </div>
                 <div>
                   <strong>Manager:</strong> manager@test.com / manager123

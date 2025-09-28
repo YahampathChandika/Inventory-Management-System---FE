@@ -349,12 +349,12 @@ export default function ReportsPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
                       <CheckCircle className="h-3 w-3 text-green-600" />
-                      <span className="text-sm">{activity.sent}</span>
+                      <span className="text-sm">{activity.sent} Emails Sent</span>
                     </div>
                     {activity.failed > 0 && (
                       <div className="flex items-center gap-1">
                         <XCircle className="h-3 w-3 text-red-600" />
-                        <span className="text-sm">{activity.failed}</span>
+                        <span className="text-sm">{activity.failed} Emails Failed</span>
                       </div>
                     )}
                   </div>
