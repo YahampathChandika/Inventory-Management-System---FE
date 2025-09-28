@@ -28,6 +28,21 @@ const roleHierarchy = {
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
 
+// Cookie utilities for server-side access
+const setCookie = (name: string, value: string, days: number = 1) => {
+  if (typeof document === "undefined") return;
+
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+};
+
+const deleteCookie = (name: string) => {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Lax`;
+};
+
 const getStoredToken = (): string | null => {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(TOKEN_KEY);
@@ -47,8 +62,11 @@ const setStoredToken = (token: string | null): void => {
   if (typeof window === "undefined") return;
   if (token) {
     localStorage.setItem(TOKEN_KEY, token);
+    // Also set as cookie for middleware access
+    setCookie(TOKEN_KEY, token, 1); // 1 day expiration
   } else {
     localStorage.removeItem(TOKEN_KEY);
+    deleteCookie(TOKEN_KEY);
   }
 };
 
@@ -109,12 +127,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const storedUser = getStoredUser();
 
     if (storedToken && storedUser) {
-      set({
-        user: storedUser,
-        token: storedToken,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      // Verify token is still valid (optional)
+      const isValidToken = isTokenValid(storedToken);
+
+      if (isValidToken) {
+        set({
+          user: storedUser,
+          token: storedToken,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+
+        // Ensure cookie is set for middleware
+        setCookie(TOKEN_KEY, storedToken, 1);
+      } else {
+        // Token expired, clear everything
+        get().logout();
+      }
     } else {
       set({
         user: null,
@@ -151,3 +180,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return !!user; // All authenticated users can view
   },
 }));
+
+// Helper function to check if token is valid (optional)
+function isTokenValid(token: string): boolean {
+  try {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload));
+
+    // Check if token is expired
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decoded.exp > currentTime;
+  } catch {
+    return false;
+  }
+}
