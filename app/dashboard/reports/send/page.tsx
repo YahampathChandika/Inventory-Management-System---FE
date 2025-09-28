@@ -136,7 +136,7 @@ export default function SendReportPage() {
   const isFormValid = recipientEmails.length > 0 && subject.trim().length > 0;
 
   return (
-    <div className="space-y-6 max-w-7xll w-full">
+    <div className="space-y-6 max-w-7xl">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/dashboard/reports">

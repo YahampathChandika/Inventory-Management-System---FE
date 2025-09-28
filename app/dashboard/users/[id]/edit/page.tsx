@@ -105,7 +105,7 @@ export default function EditUserPage() {
       </div>
 
       {/* Form */}
-      <div className="max-w-7xll w-full">
+      <div className="max-w-7xl">
         <UserForm
           mode="edit"
           initialData={user}

@@ -40,7 +40,7 @@ export default function NewInventoryPage() {
         </div>
 
         {/* Form */}
-        <div className="max-w-7xll w-full">
+        <div className="max-w-7xl">
           <InventoryForm
             mode="create"
             onSubmit={handleSubmit as any}

@@ -38,7 +38,7 @@ export default function NewUserPage() {
       </div>
 
       {/* Form */}
-      <div className="max-w-7xll w-full">
+      <div className="max-w-7xl">
         <UserForm
           mode="create"
           onSubmit={handleSubmit as any}

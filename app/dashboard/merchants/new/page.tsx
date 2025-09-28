@@ -38,7 +38,7 @@ export default function NewMerchantPage() {
       </div>
 
       {/* Form */}
-      <div className="max-w-7xll w-full">
+      <div className="max-w-7xl">
         <MerchantForm
           mode="create"
           onSubmit={handleSubmit as any}
