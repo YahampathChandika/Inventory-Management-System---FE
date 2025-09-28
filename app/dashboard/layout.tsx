@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -14,6 +14,22 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, isLoading, user } = useAuthStore();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Load collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("sidebar-collapsed");
+    if (saved !== null) {
+      setIsCollapsed(JSON.parse(saved));
+    }
+  }, []);
+
+  // Save collapsed state to localStorage
+  const handleToggleCollapse = () => {
+    const newCollapsed = !isCollapsed;
+    setIsCollapsed(newCollapsed);
+    localStorage.setItem("sidebar-collapsed", JSON.stringify(newCollapsed));
+  };
 
   useEffect(() => {
     // Redirect unauthenticated users to login
@@ -54,17 +70,24 @@ export default function DashboardLayout({
   // Render dashboard layout for authenticated users
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex">
-        {/* Sidebar Navigation */}
-        <Sidebar />
+      <div className="flex h-screen overflow-hidden">
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <Sidebar isCollapsed={isCollapsed} className="h-full" />
+        </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
           {/* Header */}
-          <Header />
+          <Header
+            isCollapsed={isCollapsed}
+            onToggleCollapse={handleToggleCollapse}
+          />
 
           {/* Page Content */}
-          <main className="flex-1 p-6 overflow-auto">{children}</main>
+          <main className="flex-1 overflow-auto">
+            <div className="p-4 md:p-6">{children}</div>
+          </main>
         </div>
       </div>
     </div>
