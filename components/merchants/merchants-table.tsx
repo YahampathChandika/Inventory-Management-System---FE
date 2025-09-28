@@ -202,7 +202,7 @@ export function MerchantsTable({
 
       {/* Table */}
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="py-0 px-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin" />

@@ -22,7 +22,6 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 import Link from "next/link";
-import { usePermissions } from "@/components/auth";
 import { MobileSidebar } from "./mobile-sidebar";
 import { useCallback } from "react";
 
@@ -34,9 +33,8 @@ interface HeaderProps {
 
 export function Header({ title, isCollapsed, onToggleCollapse }: HeaderProps) {
   const { logout } = useAuth();
-  const { user } = useAuthStore();
+  const { user, hasPermission } = useAuthStore();
   const { theme, setTheme } = useTheme();
-  const { canAccess } = usePermissions();
 
   const handleLogout = () => {
     logout();
@@ -128,26 +126,6 @@ export function Header({ title, isCollapsed, onToggleCollapse }: HeaderProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-
-              {/* Profile Settings */}
-              {/* {canAccess("profile.view") && (
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-              )} */}
-
-              {/* Settings - Admin only */}
-              {/* {canAccess("users.view") && (
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-              )} */}
 
               <DropdownMenuSeparator />
 

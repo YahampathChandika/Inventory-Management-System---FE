@@ -10,10 +10,25 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getNavigationItems } from "@/lib/navigation";
-import { usePermissions } from "@/components/auth";
+import { useAuthStore } from "@/lib/store/auth";
 import { cn } from "@/lib/utils";
-import { Package } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  Store,
+  Mail,
+  Settings,
+  LucideIcon,
+} from "lucide-react";
+
+interface NavigationItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  description?: string;
+  requiredRole: "Viewer" | "Manager" | "Admin";
+}
 
 interface SidebarProps {
   className?: string;
@@ -29,11 +44,51 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
-  const { getAllPermissions } = usePermissions();
+  const { hasPermission } = useAuthStore();
 
-  // Get user permissions and filter navigation items
-  const userPermissions = getAllPermissions();
-  const visibleNavItems = getNavigationItems(userPermissions);
+  // Define navigation items with role requirements
+  const navigationItems: NavigationItem[] = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+      description: "Overview and statistics",
+      requiredRole: "Viewer", // All roles can access
+    },
+    {
+      label: "Inventory",
+      href: "/dashboard/inventory",
+      icon: Package,
+      description: "Manage inventory items",
+      requiredRole: "Viewer", // All roles can view inventory
+    },
+    {
+      label: "Merchants",
+      href: "/dashboard/merchants",
+      icon: Store,
+      description: "Manage merchant contacts",
+      requiredRole: "Manager", // Manager+ only
+    },
+    {
+      label: "Reports",
+      href: "/dashboard/reports",
+      icon: Mail,
+      description: "Send inventory reports",
+      requiredRole: "Manager", // Manager+ only
+    },
+    {
+      label: "Users",
+      href: "/dashboard/users",
+      icon: Users,
+      description: "Manage system users",
+      requiredRole: "Admin", // Admin only
+    },
+  ];
+
+  // Filter navigation items based on user permissions
+  const visibleNavItems = navigationItems.filter((item) =>
+    hasPermission(item.requiredRole)
+  );
 
   // Check if current path matches navigation item
   const isActiveRoute = (href: string) => {
@@ -92,49 +147,40 @@ export function Sidebar({
             <Button
               variant={isActive ? "secondary" : "ghost"}
               className={cn(
-                "w-full gap-3 h-10 transition-colors justify-center",
-                isCollapsed && !isMobile ? "px-2" : "px-3",
-                isActive && "bg-secondary font-medium",
-                !isActive && "hover:bg-muted/50"
+                "w-full gap-3 h-10 transition-colors",
+                isCollapsed && !isMobile
+                  ? "justify-center px-2"
+                  : "justify-start px-3"
               )}
               asChild
             >
               <Link href={item.href} onClick={handleNavClick}>
-                <Icon className="h-5 w-5 flex-shrink-0" />
+                <Icon className="h-4 w-4 flex-shrink-0" />
                 {(!isCollapsed || isMobile) && (
-                  <div className="flex items-center justify-between w-full min-w-0">
-                    <span className="truncate">{item.label}</span>
-                    {item.badge && (
-                      <Badge variant="secondary" className="ml-2">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </div>
+                  <span className="truncate">{item.label}</span>
                 )}
               </Link>
             </Button>
           );
 
-          // Show tooltip when collapsed (desktop only)
+          // Wrap with tooltip for collapsed state
           if (isCollapsed && !isMobile) {
             return (
-              <Tooltip key={item.href} delayDuration={0}>
-                <TooltipTrigger asChild>{navButton}</TooltipTrigger>
-                <TooltipContent
-                  side="right"
-                  className="flex items-center gap-2"
-                >
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <Badge variant="secondary">{item.badge}</Badge>
-                  )}
-                  {item.description && (
-                    <span className="text-xs text-muted-foreground">
-                      • {item.description}
-                    </span>
-                  )}
-                </TooltipContent>
-              </Tooltip>
+              <TooltipProvider key={item.href}>
+                <Tooltip>
+                  <TooltipTrigger asChild>{navButton}</TooltipTrigger>
+                  <TooltipContent side="right">
+                    <div>
+                      <p className="font-medium">{item.label}</p>
+                      {item.description && (
+                        <p className="text-xs text-muted-foreground">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             );
           }
 
@@ -142,21 +188,37 @@ export function Sidebar({
         })}
       </nav>
 
-      {/* Footer - Optional branding or version info */}
-      {(!isCollapsed || isMobile) && (
+      {/* Footer - User info when collapsed */}
+      {isCollapsed && !isMobile && (
         <div className="p-4 border-t">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">Version 1.0.0</p>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <span className="text-xs font-medium text-primary">
+                    {useAuthStore
+                      .getState()
+                      .user?.username?.charAt(0)
+                      .toUpperCase()}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <div>
+                  <p className="font-medium">
+                    {useAuthStore.getState().user?.username}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {useAuthStore.getState().user?.role.name}
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
     </div>
   );
-
-  // Wrap with TooltipProvider for desktop collapsed state
-  if (!isMobile) {
-    return <TooltipProvider>{sidebarContent}</TooltipProvider>;
-  }
 
   return sidebarContent;
 }
