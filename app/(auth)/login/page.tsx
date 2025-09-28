@@ -65,17 +65,20 @@ export default function LoginPage() {
 
       // Redirect to intended page or dashboard
       router.push(redirectTo);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
 
       // Extract error message from backend response
       let errorMessage = "Login failed. Please try again.";
 
-      if (error.message) {
-        if (Array.isArray(error.message)) {
-          errorMessage = error.message.join(", ");
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error && typeof error === "object" && "message" in error) {
+        const errorObj = error as { message: string | string[] };
+        if (Array.isArray(errorObj.message)) {
+          errorMessage = errorObj.message.join(", ");
         } else {
-          errorMessage = error.message;
+          errorMessage = errorObj.message;
         }
       }
 

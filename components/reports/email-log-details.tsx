@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import {
   Mail,
   User,
-  Calendar,
   CheckCircle,
   XCircle,
   Clock,

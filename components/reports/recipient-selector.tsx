@@ -59,11 +59,6 @@ export function RecipientSelector({
     .map((email) => email.trim())
     .filter((email) => email.length > 0);
 
-  // Get custom emails that are selected
-  const selectedCustomEmails = selectedEmails.filter(
-    (email) => !merchants?.some((merchant) => merchant.email === email)
-  );
-
   const handleMerchantToggle = (merchantId: number, merchantEmail: string) => {
     const isSelected = selectedEmails.includes(merchantEmail);
 

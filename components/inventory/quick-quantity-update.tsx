@@ -59,7 +59,7 @@ export function QuickQuantityUpdate({
             Update Quantity
           </DialogTitle>
           <DialogDescription>
-            Update the quantity for "{item.name}"
+            Update the quantity for &quot;{item.name}&quot;
           </DialogDescription>
         </DialogHeader>
 

@@ -13,15 +13,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { useAuthStore } from "@/lib/store/auth";
 import { useTheme } from "next-themes";
 import {
-  User,
   LogOut,
   Sun,
   Moon,
-  Settings,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import Link from "next/link";
 import { MobileSidebar } from "./mobile-sidebar";
 import { useCallback } from "react";
 
@@ -33,7 +30,7 @@ interface HeaderProps {
 
 export function Header({ title, isCollapsed, onToggleCollapse }: HeaderProps) {
   const { logout } = useAuth();
-  const { user, hasPermission } = useAuthStore();
+  const { user } = useAuthStore();
   const { theme, setTheme } = useTheme();
 
   const handleLogout = () => {

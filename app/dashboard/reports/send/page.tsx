@@ -24,8 +24,6 @@ import {
   Send,
   Users,
   Mail,
-  Plus,
-  Trash2,
   Eye,
   Loader2,
   CheckCircle,

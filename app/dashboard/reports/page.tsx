@@ -18,7 +18,6 @@ import {
   AlertTriangle,
   Download,
   History,
-  MoreHorizontal,
   Plus,
   Loader2,
   TrendingUp,
@@ -37,7 +36,6 @@ import {
 } from "@/hooks/use-email-logs";
 import { useActiveMerchants } from "@/hooks/use-merchants";
 import { useAuthStore } from "@/lib/store/auth";
-import { toast } from "sonner";
 
 export default function ReportsPage() {
   const { hasPermission } = useAuthStore();
@@ -67,7 +65,7 @@ export default function ReportsPage() {
         <div className="text-center">
           <AlertTriangle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-muted-foreground">
-            You don't have permission to access reports
+            You don&apos;t have permission to access reports
           </p>
         </div>
       </div>

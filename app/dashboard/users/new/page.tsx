@@ -5,15 +5,25 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserForm } from "@/components/users/user-form";
 import { useCreateUser } from "@/hooks/use-users";
-import { CreateUserRequest } from "@/hooks/use-users";
+import { CreateUserRequest, UpdateUserRequest } from "@/hooks/use-users";
 import { ArrowLeft } from "lucide-react";
 
 export default function NewUserPage() {
   const router = useRouter();
   const createUserMutation = useCreateUser();
 
-  const handleSubmit = (data: CreateUserRequest) => {
-    createUserMutation.mutate(data, {
+  const handleSubmit = (data: CreateUserRequest | UpdateUserRequest) => {
+    // Since this is create mode, we can safely cast to CreateUserRequest
+    // The form will provide all required fields for creation
+    const createData: CreateUserRequest = {
+      username: data.username!,
+      email: data.email!,
+      password: (data as CreateUserRequest).password,
+      roleId: data.roleId!,
+      isActive: data.isActive ?? true,
+    };
+
+    createUserMutation.mutate(createData, {
       onSuccess: () => {
         router.push("/dashboard/users");
       },
@@ -41,7 +51,7 @@ export default function NewUserPage() {
       <div className="max-w-7xl">
         <UserForm
           mode="create"
-          onSubmit={handleSubmit as any}
+          onSubmit={handleSubmit}
           isLoading={createUserMutation.isPending}
         />
       </div>

@@ -154,8 +154,8 @@ export function BulkImport({ children }: BulkImportProps) {
                 disabled={bulkImportMutation.isPending}
               />
               <p className="text-xs text-muted-foreground">
-                Used as prefix for auto-generated names (e.g., "Merchant 1",
-                "Merchant 2")
+                Used as prefix for auto-generated names (e.g., &quot;Merchant 1&quot;,
+                &quot;Merchant 2&quot;)
               </p>
             </div>
 

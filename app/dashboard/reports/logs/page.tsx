@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
   Mail,
   TrendingUp,
   Download,
-  RefreshCw,
   CheckCircle,
   XCircle,
   Clock,
@@ -33,7 +31,7 @@ export default function EmailLogsPage() {
         <div className="text-center">
           <Mail className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-muted-foreground">
-            You don't have permission to view email logs
+            You don&apos;t have permission to view email logs
           </p>
         </div>
       </div>
@@ -181,7 +179,7 @@ export default function EmailLogsPage() {
               <div>
                 <h4 className="font-medium">Sent</h4>
                 <p className="text-sm text-muted-foreground">
-                  Email was successfully delivered to the recipient's server
+                  Email was successfully delivered to the recipient&apos;s server
                 </p>
               </div>
             </div>

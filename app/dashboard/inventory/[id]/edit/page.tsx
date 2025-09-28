@@ -108,7 +108,7 @@ export default function EditInventoryPage() {
           <div>
             <h1 className="text-2xl font-bold">Edit Inventory Item</h1>
             <p className="text-muted-foreground">
-              Update details for "{item.name}"
+              Update details for &quot;{item.name}&quot;
             </p>
           </div>
         </div>

@@ -6,14 +6,21 @@ import { Button } from "@/components/ui/button";
 import { MerchantForm } from "@/components/merchants/merchant-form";
 import { useCreateMerchant } from "@/hooks/use-merchants";
 import { CreateMerchant } from "@/types";
+import { UpdateMerchantRequest } from "@/hooks/use-merchants";
 import { ArrowLeft } from "lucide-react";
 
 export default function NewMerchantPage() {
   const router = useRouter();
   const createMerchantMutation = useCreateMerchant();
 
-  const handleSubmit = (data: CreateMerchant) => {
-    createMerchantMutation.mutate(data, {
+  const handleSubmit = (data: CreateMerchant | UpdateMerchantRequest) => {
+    const createData: CreateMerchant = {
+      name: data.name!,
+      email: data.email!,
+      isActive: data.isActive ?? true,
+    };
+
+    createMerchantMutation.mutate(createData, {
       onSuccess: () => {
         router.push("/dashboard/merchants");
       },
@@ -41,7 +48,7 @@ export default function NewMerchantPage() {
       <div className="max-w-7xl">
         <MerchantForm
           mode="create"
-          onSubmit={handleSubmit as any}
+          onSubmit={handleSubmit}
           isLoading={createMerchantMutation.isPending}
         />
       </div>

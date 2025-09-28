@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useInventory, useDeleteInventoryItem } from "@/hooks/use-inventory";
 import { useAuthStore } from "@/lib/store/auth";
@@ -35,7 +35,6 @@ import {
   Hash,
 } from "lucide-react";
 import { QuickQuantityUpdate } from "./quick-quantity-update";
-import { toast } from "sonner";
 
 interface InventoryTableProps {
   searchable?: boolean;

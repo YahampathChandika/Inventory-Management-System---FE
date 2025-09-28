@@ -99,7 +99,7 @@ export default function EditUserPage() {
         <div>
           <h1 className="text-2xl font-bold">Edit User</h1>
           <p className="text-muted-foreground">
-            Update details for "{user.username}"
+            Update details for &quot;{user.username}&quot;
           </p>
         </div>
       </div>

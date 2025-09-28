@@ -99,7 +99,7 @@ export default function EditMerchantPage() {
         <div>
           <h1 className="text-2xl font-bold">Edit Merchant</h1>
           <p className="text-muted-foreground">
-            Update details for "{merchant.name}"
+            Update details for &quot;{merchant.name}&quot;
           </p>
         </div>
       </div>

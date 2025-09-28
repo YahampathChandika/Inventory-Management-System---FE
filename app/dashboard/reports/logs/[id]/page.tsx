@@ -26,7 +26,7 @@ export default function EmailLogDetailsPage({
         <div className="text-center">
           <AlertTriangle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-muted-foreground">
-            You don't have permission to view email logs
+            You don&apos;t have permission to view email logs
           </p>
         </div>
       </div>

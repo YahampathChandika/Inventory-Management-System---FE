@@ -230,7 +230,7 @@ export function MerchantForm({
             <li>
               • Double-check email addresses to ensure reports are delivered
             </li>
-            <li>• Inactive merchants won't receive any reports</li>
+            <li>• Inactive merchants won&apos;t receive any reports</li>
             <li>• You can bulk import multiple merchants from the main page</li>
           </ul>
         </div>

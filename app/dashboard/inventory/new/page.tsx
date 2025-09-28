@@ -6,15 +6,23 @@ import { Button } from "@/components/ui/button";
 import { InventoryForm } from "@/components/inventory/inventory-form";
 import { ProtectedRoute } from "@/components/layout/protected-route";
 import { useCreateInventoryItem } from "@/hooks/use-inventory";
-import { CreateInventoryItem } from "@/types";
+import { CreateInventoryItem, UpdateInventoryItem } from "@/types";
 import { ArrowLeft } from "lucide-react";
 
 export default function NewInventoryPage() {
   const router = useRouter();
   const createItemMutation = useCreateInventoryItem();
 
-  const handleSubmit = (data: CreateInventoryItem) => {
-    createItemMutation.mutate(data, {
+  const handleSubmit = (data: CreateInventoryItem | UpdateInventoryItem) => {
+    const createData: CreateInventoryItem = {
+      name: data.name!,
+      description: data.description,
+      quantity: data.quantity!,
+      unitPrice: data.unitPrice,
+      sku: data.sku,
+    };
+
+    createItemMutation.mutate(createData, {
       onSuccess: () => {
         router.push("/dashboard/inventory");
       },
@@ -43,7 +51,7 @@ export default function NewInventoryPage() {
         <div className="max-w-7xl">
           <InventoryForm
             mode="create"
-            onSubmit={handleSubmit as any}
+            onSubmit={handleSubmit}
             isLoading={createItemMutation.isPending}
           />
         </div>

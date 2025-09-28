@@ -53,7 +53,7 @@ export function ProtectedRoute({
               Access Denied
             </h1>
             <p className="text-muted-foreground">
-              You don't have permission to view this page.
+              You don&apos;t have permission to view this page.
             </p>
           </div>
         </div>
