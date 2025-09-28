@@ -22,7 +22,7 @@ export default function EditMerchantPage() {
       { id, data },
       {
         onSuccess: () => {
-          router.push("/merchants");
+          router.push("/dashboard/merchants");
         },
       }
     );
@@ -32,7 +32,7 @@ export default function EditMerchantPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/merchants">
+          <Link href="/dashboard/merchants">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -59,7 +59,7 @@ export default function EditMerchantPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/merchants">
+          <Link href="/dashboard/merchants">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -77,7 +77,7 @@ export default function EditMerchantPage() {
               <p className="text-sm text-muted-foreground">
                 {error instanceof Error ? error.message : "Merchant not found"}
               </p>
-              <Link href="/merchants" className="mt-4 inline-block">
+              <Link href="/dashboard/merchants" className="mt-4 inline-block">
                 <Button variant="outline">Back to Merchants</Button>
               </Link>
             </div>
@@ -91,7 +91,7 @@ export default function EditMerchantPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/merchants">
+        <Link href="/dashboard/merchants">
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

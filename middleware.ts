@@ -11,17 +11,21 @@ const ROUTE_PERMISSIONS = {
 
   // Manager+ routes (Manager and Admin)
   manager: [
-    "/inventory/new",
-    "/inventory/[id]/edit",
-    "/merchants",
-    "/merchants/new",
-    "/merchants/[id]/edit",
-    "/reports",
-    "/email-logs",
+    "/dashboard/inventory/new",
+    "/dashboard/inventory/[id]/edit",
+    "/dashboard/merchants",
+    "/dashboard/merchants/new",
+    "/dashboard/merchants/[id]/edit",
+    "/dashboard/reports",
+    "/dashboard/email-logs",
   ],
 
   // Admin-only routes
-  admin: ["/users", "/users/new", "/users/[id]/edit"],
+  admin: [
+    "/dashboard/users",
+    "/dashboard/users/new",
+    "/dashboard/users/[id]/edit",
+  ],
 } as const;
 
 // Helper function to check if route matches patterns
@@ -137,12 +141,7 @@ export function middleware(request: NextRequest) {
   // Check if user needs any authentication for other protected routes
   if (
     matchesRoute(pathname, ROUTE_PERMISSIONS.authenticated) ||
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/inventory") ||
-    pathname.startsWith("/merchants") ||
-    pathname.startsWith("/users") ||
-    pathname.startsWith("/reports") ||
-    pathname.startsWith("/profile")
+    pathname.startsWith("/dashboard")
   ) {
     // User is authenticated and has basic access
     return NextResponse.next();

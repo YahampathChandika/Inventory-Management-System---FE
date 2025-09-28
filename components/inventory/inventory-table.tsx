@@ -127,7 +127,7 @@ export function InventoryTable({
         </div>
 
         {hasPermission("Manager") && (
-          <Link href="/inventory/new">
+          <Link href="/dashboard/inventory/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Add Item
@@ -204,7 +204,7 @@ export function InventoryTable({
                           No inventory items found
                         </p>
                         {hasPermission("Manager") && (
-                          <Link href="/inventory/new" className="mt-2">
+                          <Link href="/dashboard/inventory/new" className="mt-2">
                             <Button variant="outline" size="sm">
                               <Plus className="mr-2 h-4 w-4" />
                               Add First Item
@@ -277,7 +277,7 @@ export function InventoryTable({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <Link href={`/inventory/${item.id}/edit`}>
+                                <Link href={`/dashboard/inventory/${item.id}/edit`}>
                                   <DropdownMenuItem>
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit

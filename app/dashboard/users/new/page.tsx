@@ -15,7 +15,7 @@ export default function NewUserPage() {
   const handleSubmit = (data: CreateUserRequest) => {
     createUserMutation.mutate(data, {
       onSuccess: () => {
-        router.push("/users");
+        router.push("/dashboard/users");
       },
     });
   };
@@ -24,7 +24,7 @@ export default function NewUserPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/users">
+        <Link href="/dashboard/users">
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

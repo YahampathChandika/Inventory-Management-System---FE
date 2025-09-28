@@ -22,7 +22,7 @@ export default function EditUserPage() {
       { id, data },
       {
         onSuccess: () => {
-          router.push("/users");
+          router.push("/dashboard/users");
         },
       }
     );
@@ -32,7 +32,7 @@ export default function EditUserPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/users">
+          <Link href="/dashboard/users">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -59,7 +59,7 @@ export default function EditUserPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/users">
+          <Link href="/dashboard/users">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -77,7 +77,7 @@ export default function EditUserPage() {
               <p className="text-sm text-muted-foreground">
                 {error instanceof Error ? error.message : "User not found"}
               </p>
-              <Link href="/users" className="mt-4 inline-block">
+              <Link href="/dashboard/users" className="mt-4 inline-block">
                 <Button variant="outline">Back to Users</Button>
               </Link>
             </div>
@@ -91,7 +91,7 @@ export default function EditUserPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/users">
+        <Link href="/dashboard/users">
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

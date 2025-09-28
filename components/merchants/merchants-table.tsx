@@ -161,7 +161,7 @@ export function MerchantsTable({
             </Button>
           </BulkImport>
 
-          <Link href="/merchants/new">
+          <Link href="/dashboard/merchants/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Add Merchant
@@ -231,7 +231,7 @@ export function MerchantsTable({
                           No merchants found
                         </p>
                         <div className="flex items-center gap-2">
-                          <Link href="/merchants/new">
+                          <Link href="/dashboard/merchants/new">
                             <Button variant="outline" size="sm">
                               <Plus className="mr-2 h-4 w-4" />
                               Add First Merchant
@@ -314,7 +314,9 @@ export function MerchantsTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <Link href={`/merchants/${merchant.id}/edit`}>
+                              <Link
+                                href={`/dashboard/merchants/${merchant.id}/edit`}
+                              >
                                 <DropdownMenuItem>
                                   <Edit className="mr-2 h-4 w-4" />
                                   Edit

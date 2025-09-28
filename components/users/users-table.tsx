@@ -182,7 +182,7 @@ export function UsersTable({
           </p>
         </div>
 
-        <Link href="/users/new">
+        <Link href="/dashboard/users/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add User
@@ -265,7 +265,7 @@ export function UsersTable({
                       <div className="flex flex-col items-center justify-center">
                         <Users className="h-8 w-8 text-muted-foreground mb-2" />
                         <p className="text-muted-foreground">No users found</p>
-                        <Link href="/users/new" className="mt-2">
+                        <Link href="/dashboard/users/new" className="mt-2">
                           <Button variant="outline" size="sm">
                             <Plus className="mr-2 h-4 w-4" />
                             Add First User
@@ -349,7 +349,7 @@ export function UsersTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <Link href={`/users/${user.id}/edit`}>
+                              <Link href={`/dashboard/users/${user.id}/edit`}>
                                 <DropdownMenuItem>
                                   <Edit className="mr-2 h-4 w-4" />
                                   Edit

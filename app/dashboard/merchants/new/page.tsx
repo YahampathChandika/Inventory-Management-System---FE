@@ -15,7 +15,7 @@ export default function NewMerchantPage() {
   const handleSubmit = (data: CreateMerchant) => {
     createMerchantMutation.mutate(data, {
       onSuccess: () => {
-        router.push("/merchants");
+        router.push("/dashboard/merchants");
       },
     });
   };
@@ -24,7 +24,7 @@ export default function NewMerchantPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/merchants">
+        <Link href="/dashboard/merchants">
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

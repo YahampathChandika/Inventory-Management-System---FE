@@ -21,7 +21,7 @@ export function Providers({ children }: ProvidersProps) {
     >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>{children}</AuthProvider>
-        <Toaster position="top-right" />
+        <Toaster position="bottom-right" />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ThemeProvider>

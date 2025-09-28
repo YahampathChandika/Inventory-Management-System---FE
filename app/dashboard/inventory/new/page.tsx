@@ -16,7 +16,7 @@ export default function NewInventoryPage() {
   const handleSubmit = (data: CreateInventoryItem) => {
     createItemMutation.mutate(data, {
       onSuccess: () => {
-        router.push("/inventory");
+        router.push("/dashboard/inventory");
       },
     });
   };
@@ -26,7 +26,7 @@ export default function NewInventoryPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Link href="/inventory">
+          <Link href="/dashboard/inventory">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>

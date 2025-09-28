@@ -26,7 +26,7 @@ export default function EditInventoryPage() {
       { id, data },
       {
         onSuccess: () => {
-          router.push("/inventory");
+          router.push("/dashboard/inventory");
         },
       }
     );
@@ -37,7 +37,7 @@ export default function EditInventoryPage() {
       <ProtectedRoute requiredRole="Manager">
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <Link href="/inventory">
+            <Link href="/dashboard/inventory">
               <Button variant="outline" size="icon">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -66,7 +66,7 @@ export default function EditInventoryPage() {
       <ProtectedRoute requiredRole="Manager">
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <Link href="/inventory">
+            <Link href="/dashboard/inventory">
               <Button variant="outline" size="icon">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -84,7 +84,7 @@ export default function EditInventoryPage() {
                 <p className="text-sm text-muted-foreground">
                   {error instanceof Error ? error.message : "Item not found"}
                 </p>
-                <Link href="/inventory" className="mt-4 inline-block">
+                <Link href="/dashboard/inventory" className="mt-4 inline-block">
                   <Button variant="outline">Back to Inventory</Button>
                 </Link>
               </div>
@@ -100,7 +100,7 @@ export default function EditInventoryPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Link href="/inventory">
+          <Link href="/dashboard/inventory">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
