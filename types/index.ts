@@ -94,6 +94,62 @@ export interface SendInventoryReport {
   customMessage?: string;
 }
 
+// Extended Email Types
+export interface EmailLogQueryParams {
+  page?: number;
+  limit?: number;
+  status?: "sent" | "failed" | "pending";
+  dateFrom?: string;
+  dateTo?: string;
+  search?: string;
+}
+
+export interface InventoryReportData {
+  itemName: string;
+  quantity: number;
+  sku: string;
+  unitPrice: number;
+}
+
+export interface SendReportResponse {
+  jobId: string;
+  recipientCount: number;
+  totalSent: number;
+  totalFailed: number;
+  estimatedTime: string;
+  results: Array<{
+    email: string;
+    success: boolean;
+    error?: string;
+  }>;
+}
+
+export interface ReportStats {
+  totalItems: number;
+  lowStockItems: number;
+  activeMerchants: number;
+  lastReportGenerated: string;
+}
+
+export interface EmailLogDetails extends EmailLog {
+  sentBy: {
+    id: number;
+    username: string;
+    role: string;
+  };
+}
+
+export interface EmailLogStats {
+  totalEmails: number;
+  totalSent: number;
+  totalFailed: number;
+  totalPending: number;
+  todayCount: number;
+  thisWeekCount: number;
+  thisMonthCount: number;
+  successRate: number;
+}
+
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;

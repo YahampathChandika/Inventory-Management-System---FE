@@ -86,7 +86,7 @@ export default function DashboardLayout({
 
           {/* Page Content */}
           <main className="flex-1 overflow-auto">
-            <div className="p-4 md:p-6">{children}</div>
+            <div className="p-4 md:p-6 flex items-center justify-center">{children}</div>
           </main>
         </div>
       </div>

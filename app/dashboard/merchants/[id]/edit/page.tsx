@@ -105,7 +105,7 @@ export default function EditMerchantPage() {
       </div>
 
       {/* Form */}
-      <div className="max-w-4xl">
+      <div className="max-w-7xll w-full">
         <MerchantForm
           mode="edit"
           initialData={merchant}

@@ -218,7 +218,7 @@ export function useActiveMerchants() {
     queryKey: ["merchants", "active"],
     queryFn: async () => {
       const response = await apiClient.get<PaginatedResponse<Merchant>>(
-        "/merchants?status=active&limit=1000"
+        "/merchants?status=active&limit=100"
       );
       return response.data;
     },
